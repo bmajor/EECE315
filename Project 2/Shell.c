@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <Windows.h>
 #include <string.h>
+#include <sys/utsname.h> // include this to use uname();
 
 struct command_t { 
 	char *name;
@@ -9,6 +10,7 @@ struct command_t {
 	char *argv[];
 };
 
+struct utsname unameData;
 
 int main () {
 
@@ -16,7 +18,18 @@ int main () {
 	wchar_t CompName [MAX_COMPUTERNAME_LENGTH + 1];
 	DWORD CNameSize = sizeof ( CompName);
 	GetComputerName( &CompName[0], &CNameSize);
-
+	
+	// Or could try this; to get comp name;
+	if ( uname(&unameData) == 0) {
+//	printf("%s\n%s\n%s\n%s\n%s\n", unameData.sysname, unameData.nodename, unameData.release, unameData.version, unameData.machine);
+	int i = 0;
+	for (i; i < 8; i++) // arbitrary size
+		if (  unameData.nodename[i] != '\0')
+			printf("unameData.nodename[i] = %c \n", unameData.nodename[i]);
+	} else
+		printf("uname() failure\n");
+	}
+	
 	while(1)
 	{
 		int i;
