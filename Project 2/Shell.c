@@ -17,16 +17,35 @@ int main () {
 	
 	char CompName[MAXHOSTNAMELEN+1];
 	size_t CompNameLen = MAXHOSTNAMELEN;
-	gethostname(CompName, CompNameLen);
-
+	if(gethostname(CompName, CompNameLen) != 0){
+		printf("\nThe Name of the Computer could not be retrieved\n");
+	}
+	
+	char PathName [1024];
+	size_t PathNameSize = 1024;
+	
+	getcwd(PathName, PathNameSize);
 	
 	//while(1)
 	{
 		int i;
 		for(i=0;CompName[i] != '\0';i++){		
-		printf("%c",CompName[i]);
+			printf("%c",CompName[i]);
 		}
-		printf("$~$");
+		
+		printf("$~");
+		
+		if (getcwd(PathName, PathNameSize) == NULL){
+			perror("getcwd() error");
+		}
+		else {
+			
+		
+			for(i=0;PathName[i] != '\0'; i++){
+				printf("%c",PathName[i]);
+			}
+		}
+		printf("$ ");
 
 		// Print the prompt string
 		// Read the command line and parse it 
