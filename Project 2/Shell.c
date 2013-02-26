@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/param.h>
 #include <unistd.h>
+#include <linux/limits.h>
 
 struct command_t { 
 	char *name;
@@ -16,43 +17,40 @@ int main () {
 	struct command_t *command; // Shell initialization
 	
 	char CompName[MAXHOSTNAMELEN+1];
-	size_t CompNameLen = MAXHOSTNAMELEN;
-	if(gethostname(CompName, CompNameLen) != 0){
-		printf("\nThe Name of the Computer could not be retrieved\n");
-	}
+	gethostname(CompName, MAXHOSTNAMELEN);
 	
-	char PathName [1024];
-	size_t PathNameSize = 1024;
+	char PathName [PATH_MAX+1];	
+	getcwd(PathName, PATH_MAX);
 	
-	getcwd(PathName, PathNameSize);
+	char CommandLine[4092];
 	
-	//while(1)
+	//while(1) //Continuously run the command line UNLESS exit is called.
 	{
-		int i;
-		for(i=0;CompName[i] != '\0';i++){		
-			printf("%c",CompName[i]);
-		}
-		
-		printf("$~");
-		
-		if (getcwd(PathName, PathNameSize) == NULL){
+		//Print the prompt String
+		printf("%s",CompName);		
+		printf(":~");		
+		if (getcwd(PathName, PATH_MAX) == NULL){
 			perror("getcwd() error");
 		}
-		else {
-			
-		
-			for(i=0;PathName[i] != '\0'; i++){
-				printf("%c",PathName[i]);
-			}
-		}
-		printf("$ ");
+		else {	
+			printf("%s",PathName);
+		}		
+		printf("$ ");		
 
-		// Print the prompt string
-		// Read the command line and parse it 
+		// Read the command line and parse it
+		char* Args;
+		
+		scanf("%s", CommandLine);
+		Args = strtok (CommandLine, " ");
+		while(Args != NULL){
+			printf("%s", Args);		
+			break;
+		}
+		
 		// Find the full pathname for the file
 		// Create a process to execute the command
 		// Parent waits until child finishes executing command }
-		printf("\nPress Enter to exit");
+		printf("\nPress Enter to exit\n");
 		while(getchar() != '\n');
 	}
 
