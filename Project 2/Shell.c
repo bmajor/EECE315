@@ -23,6 +23,7 @@ int main () {
 	getcwd(PathName, PATH_MAX);
 	
 	char CommandLine[PATH_MAX*2];
+	pid_t childPID;
 	
 	while(1) //Continuously run the command line UNLESS exit is called.
 	{
@@ -51,7 +52,12 @@ int main () {
 		}
 		else{
 			char* last = strrchr(Args, '/');
-			strcpy(shortPath, Args);
+			if(strstr(Args,"./")==Args){				
+				strcpy(shortPath, Args);				
+			}
+			else{
+				shortPath = strcat("./", Args); 		
+			}
 			strcpy(command->name, last+1);
 			Args = command->name;
 		}
@@ -66,50 +72,62 @@ int main () {
 		
 		command -> argv[k] = NULL;
 		
+		//commands that run on the parent thread
 		if (strcmp(command->argv[0],"exit") == 0 ){
 			return 0;
 		}
 		
-		pid_t childPID;
-		childPID = fork();
-		//Fork a child here and run all following instructions as child
-		if(childPID == 0){
-				
-			// Change the directory if the first argument is cd
-			if (strcmp(command->argv[0],"cd") == 0 ){
-
-				if(command->argc <2) {
-					chdir(getenv("HOME"));
-				}
-				else{
-					chdir(command->argv[1]);
-				}
-			}
+		else if (strcmp(command->argv[0],"cd") == 0 ){
 			
-			else if (strcmp(command->argv[0],"exit") == 0 ){
+			int ret;
+			if(command->argc < 2) {
+				ret = chdir(getenv("HOME"));
+			}
+			else{
+				ret = chdir(command->argv[1]);		
+			}
+			if(ret<0){
+				printf("No such file or directory found");
+			}
+		}
+		
+		else if (strcmp(command->argv[0],"set") == 0){
+		
+		}
+		
+		//If it is not an instruction to be run by the parent, fork a child
+		else {
+			childPID = fork();
+		
+		
+			if(childPID == 0){
+				
+			
+						
+				if (strcmp(command->argv[0],"printenv") == 0 ){
+					printf("The environment variables are %s\n", getenv("PATH"));
+				}
+			
+				else if (strcmp(command->argv[0],"set") == 0 ){
+				
+				}
+			
+				else{
+					realpath(shortPath,Path);
+					execv(Path, command->argv);
+				}
 				return 0;
 			}
-			
-			else if (strcmp(command->argv[0],"printenv") == 0 ){
-				printf("%s", getenv("PATH"));
+			else if (childPID == -1){
+				printf("\nCould not fork process");
 			}
-			
+		
+			// Parent waits until child finishes executing command }
+		
 			else{
-			//	realpath(shortPath,Path);
-			//	execv(Path, command.argv);
-			}
-			return 0;
-		}
-		else if (childPID == -1){
-			printf("\nCould not fork process");
-		}
-		
-		// Parent waits until child finishes executing command }
-		
-		else{
-			wait();
+				wait();
+			}	
 		}	
-				
 		
 	}	
 
