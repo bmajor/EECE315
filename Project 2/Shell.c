@@ -112,6 +112,11 @@ int main () {
 		
 		}
 		
+		// Rename a file. Ex: mv ./folder/oldname.txt ./folder/newname.txt
+		else if (strcmp(command->argv[0],"mv") == 0){
+			rename(command->argv[1], command->argv[2]);
+		}
+		
 		//If it is not an instruction to be run by the parent, fork a child
 		else {
 			childPID = fork();
