@@ -42,11 +42,15 @@ int main () {
 		
 		gets(CommandLine);
 		Args = strtok (CommandLine, " ");
+		command->name = malloc(NAME_MAX+1);
+		command->name = Args;
+		printf("%s", command->name);
+		
 		
 		while(Args != NULL){
 			command->argv[k] = malloc(PATH_MAX);
 			strcpy(command->argv[k], Args);
-			command->argc = k;
+			command->argc += 1;
 			Args = strtok (NULL, " ");
 			k++;		
 		}
