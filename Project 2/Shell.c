@@ -75,7 +75,10 @@ int main () {
 		
 		// Change the directory if the first argument is cd
 		if (strcmp(command->argv[0],"cd") == 0 ){
-			changeDir(command->argv[1]);
+			if ( command->argc < 2 ) {
+				changeDir(getenv("HOME"));
+			} else
+				changeDir(command->argv[1]);
 		}
 		else if (strcmp(command->argv[0],"[something]") == 0 ){
 		
