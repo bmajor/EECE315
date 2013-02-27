@@ -14,7 +14,7 @@ struct command_t {
 
 int main () {
 
-	struct command_t *command = malloc(sizeof *command); // Shell initialization
+	struct command_t* command = malloc(sizeof (struct command_t)); // Shell initialization
 	
 	char CompName[MAXHOSTNAMELEN+1];
 	gethostname(CompName, MAXHOSTNAMELEN);
@@ -25,17 +25,20 @@ int main () {
 	char CommandLine[PATH_MAX*2];
 	pid_t childPID;
 	
+	char* Args = malloc(PATH_MAX+1);
+	char* shortPath = malloc(PATH_MAX+3);
+	command->name = malloc(NAME_MAX+1);
+	
+	
 	while(1) //Continuously run the command line unless "exit" is entered.
 	{	
 		int k=0;
 		// Read the command line and parse it
-		char* Args = malloc(PATH_MAX+1);
-		char* shortPath = malloc(PATH_MAX+3);
+		
 		strcpy(shortPath, "./");
 		char Path [PATH_MAX];
 		
-		do{
-			
+		do{			
 			//Print the prompt String
 			printf("%s:~",CompName);
 			if (getcwd(PathName, PATH_MAX) == NULL){
@@ -46,14 +49,15 @@ int main () {
 			}	
 		
 			gets(CommandLine);
-			Args = strtok (CommandLine, " ");			
-		}while(Args == NULL);
+			Args = strtok (CommandLine, " ");
+						
+		}while(Args == NULL);		
 		
-		command->name = malloc(NAME_MAX+1);
+		
 		
 		//Parsing the initial command
 		if(strrchr(Args, '/') == NULL){			
-			command->name = Args;
+			strcpy(command->name, Args);
 		}
 		else{
 			char* last = strrchr(Args, '/');
@@ -67,6 +71,7 @@ int main () {
 			Args = command->name;
 		}
 		
+		
 		//Parsing arguments		
 		while(Args != NULL){
 			command->argv[k] = malloc(PATH_MAX+1);
@@ -76,20 +81,21 @@ int main () {
 			k++;		
 		}
 		
-		command -> argv[k] = NULL;
-		
 		//commands that run on the parent thread
 		if(strcmp(command->argv[0],"")==0);
 		
 		else if (strcmp(command->argv[0],"exit") == 0 ){
-			return 0;
+			
+			free(command->argv[0]);
+			break;
 		}
+		
 		
 		else if (strcmp(command->argv[0],"cd") == 0 ){
 			
 			int ret;
 			if(command->argc < 2) {
-				ret = chdir(getenv("HOME"));
+				chdir(getenv("HOME"));
 			}
 			else{
 				ret = chdir(command->argv[1]);	
@@ -129,6 +135,7 @@ int main () {
 						printf("The file could not be found or run\n");
 					}
 				}
+				
 				return 0;
 			}
 			else if (childPID == -1){
@@ -140,9 +147,18 @@ int main () {
 			else{
 				wait();
 			}	
+		}
+		
+		
+		for(k=0;k<(command->argc);k++){
+			free(command->argv[k]);
 		}	
 		
-	}	
+	}
 
-	return 0;
+	free(Args);
+	free(shortPath);
+	free(command->name);
+	free(command);
+	return 0;	
 }
