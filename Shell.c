@@ -12,11 +12,6 @@ struct command_t {
 	char *argv[];
 };
 
-void changeDir(const char *newDir) {
-	int ret; // if fail to change dir, ret should eq to -1 but the current working dir shall remain unchanged
-	ret = chdir(newDir);
-}
-
 int main () {
 
 	struct command_t *command = malloc(sizeof *command); // Shell initialization
@@ -43,13 +38,14 @@ int main () {
 		}
 
 		// Read the command line and parse it
-		char* Args = malloc(PATH_MAX+1);
+		char* Args = malloc(PATH_MAX);
 		char shortPath [PATH_MAX];
 		char Path [PATH_MAX];
 		
 		gets(CommandLine);
 		Args = strtok (CommandLine, " ");
 		command->name = malloc(NAME_MAX+1);
+		
 		if(strrchr(Args, '/') == NULL){			
 			command->name = Args;
 		}
@@ -67,6 +63,7 @@ int main () {
 			Args = strtok (NULL, " ");
 			k++;		
 		}
+		
 		command -> argv[k] = NULL;
 		
 		if (strcmp(command->argv[0],"exit") == 0 ){
@@ -76,20 +73,16 @@ int main () {
 		pid_t childPID;
 		childPID = fork();
 		//Fork a child here and run all following instructions as child
-		if(childPID >= 0){
-		
-			// Find the full pathname for the file
-			
-			realpath(shortPath,Path);
-			
+		if(childPID == 0){
+				
 			// Change the directory if the first argument is cd
 			if (strcmp(command->argv[0],"cd") == 0 ){
 
 				if(command->argc <2) {
-					changeDir(getenv("HOME"));
+					chdir(getenv("HOME"));
 				}
 				else{
-					changeDir(command->argv[1]);
+					chdir(command->argv[1]);
 				}
 			}
 			
@@ -102,15 +95,22 @@ int main () {
 			}
 			
 			else{
+			//	realpath(shortPath,Path);
 			//	execv(Path, command.argv);
 			}
-			printf("\nChild finished");
+			return 0;
 		}
-		else{
+		else if (childPID == -1){
 			printf("\nCould not fork process");
+		}
+		
+		// Parent waits until child finishes executing command }
+		
+		else{
+			wait();
 		}	
 				
-		// Parent waits until child finishes executing command }
+		
 	}	
 
 	return 0;
