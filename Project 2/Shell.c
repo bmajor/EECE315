@@ -25,8 +25,8 @@ int main () {
 	char CommandLine[PATH_MAX*2];
 	pid_t childPID;
 	
-	char* Args = malloc(PATH_MAX+1);
-	char* shortPath = malloc(PATH_MAX+3);
+	char* Args;
+	char* shortPath = (char*)malloc(PATH_MAX+3);
 	command->name = malloc(NAME_MAX+1);
 	
 	
@@ -65,7 +65,7 @@ int main () {
 				strcpy(shortPath, Args);				
 			}
 			else{
-				shortPath = strcat(shortPath, Args); 		
+				strcat(shortPath, Args); 		
 			}
 			strcpy(command->name, last+1);
 			Args = command->name;
@@ -79,7 +79,9 @@ int main () {
 			command->argc = k+1;
 			Args = strtok (NULL, " ");
 			k++;		
-		}
+		}	
+		command->argv[k] = NULL;
+		command->argc = k+1;
 		
 		//commands that run on the parent thread
 		if(strcmp(command->argv[0],"")==0);
@@ -94,7 +96,7 @@ int main () {
 		else if (strcmp(command->argv[0],"cd") == 0 ){
 			
 			int ret;
-			if(command->argc < 2) {
+			if(command->argc < 3) {
 				chdir(getenv("HOME"));
 			}
 			else{
@@ -154,11 +156,8 @@ int main () {
 			free(command->argv[k]);
 		}	
 		
-	}
-
-	free(Args);
-	free(shortPath);
+	}//end of the while loop
+	
 	free(command->name);
-	free(command);
 	return 0;	
 }
