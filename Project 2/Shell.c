@@ -124,8 +124,8 @@ int main () {
 				}
 			
 				else if (strcmp(command->argv[0],"set") == 0 ){
-				
-				}
+					setenv(command->argv[1],command->argv[2],1); //sets environmental variables in 
+				}						     //arg[1] to arg[2]
 			
 				else{
 					if(realpath(shortPath,Path) != NULL){
