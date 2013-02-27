@@ -27,24 +27,23 @@ int main () {
 	//while(1) //Continuously run the command line UNLESS exit is called.
 	{
 		//Print the prompt String
-		printf("%s",CompName);		
-		printf(":~");		
+		printf("%s:~",CompName);
 		if (getcwd(PathName, PATH_MAX) == NULL){
 			perror("getcwd() error");
 		}
 		else {	
-			printf("%s",PathName);
-		}		
-		printf("$ ");		
+			printf("%s$ ",PathName);
+		}
 
 		// Read the command line and parse it
 		char* Args;
 		
-		scanf("%s", CommandLine);
+		gets(CommandLine);
 		Args = strtok (CommandLine, " ");
+		
 		while(Args != NULL){
-			printf("%s", Args);		
-			break;
+			printf("%s\n", Args);
+			Args = strtok (NULL, " ");		
 		}
 		
 		// Find the full pathname for the file
