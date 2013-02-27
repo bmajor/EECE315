@@ -77,9 +77,9 @@ int main () {
 		if (strcmp(command->argv[0],"cd") == 0 ){
 			if ( command->argc < 2 ) {
 				changeDir(getenv("HOME"));
-			} else
+			} else {
 				changeDir(command->argv[1]);
-		}
+			}
 		else if (strcmp(command->argv[0],"[something]") == 0 ){
 		
 		}
