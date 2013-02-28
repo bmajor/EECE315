@@ -9,7 +9,7 @@
 struct command_t { 
 	char *name;
 	int argc;
-	char *argv[];
+	char *argv[300];
 };
 
 int main () {
@@ -27,7 +27,7 @@ int main () {
 	
 	
 	char* Args;
-	char* shortPath = (char*)malloc(PATH_MAX+3);
+	char* shortPath = malloc(PATH_MAX+3);
 	command->name = malloc(NAME_MAX+1);
 	
 	
@@ -47,37 +47,36 @@ int main () {
 			else {	
 				printf("%s$ ",PathName);
 			}	
-	
 			gets(CommandLine);
-			
 		}while(strcmp(CommandLine, "")==0);
 		
 		Args = strtok (CommandLine, " ");
+		strcpy(shortPath, Args);
 		//Parsing the initial command
 		if(strrchr(Args, '/') == NULL){			
 			strcpy(command->name, Args);
-			strcpy(shortPath, Args);
 		}
 		else{
 			char* last = strrchr(Args, '/');
-			strcpy(shortPath, Args);
 			strcpy(command->name, last+1);
 			Args = command->name;
 		}	
 		
 		
-		//Parsing arguments		
+		
+		//Parsing arguments
+		printf("shortpath first is %s\n", shortPath);		
 		while(Args != NULL){
+			
 			command->argv[k] = malloc(PATH_MAX+1);
 			strcpy(command->argv[k], Args);
 			command->argc = k+1;
 			Args = strtok (NULL, " ");
 			k++;		
-		}	
+		}
+		
 		command->argv[k] = NULL;
-		command->argc = k;
-		
-		
+		printf("shortpath next is %s\n", shortPath);
 		//commands that run on the parent thread
 		if(strcmp(command->name,"")==0){
 			
@@ -94,7 +93,7 @@ int main () {
 		else if (strcmp(command->name,"cd") == 0 ){
 			
 			int ret;
-			if(command->argc < 3) {
+			if(command->argc < 2) {
 				chdir(getenv("HOME"));
 			}
 			else{
@@ -110,31 +109,28 @@ int main () {
 		//If it is not an instruction to be run by the parent, fork a child
 		else {
 		
-			for(k=0;command->argv[k]!=NULL;k++){
-				printf("%d%s%d%s\n",k,command->name,command->argc,command->argv[k]);
-			}
+			
 			
 			childPID = fork();
 			
 			if(childPID == 0){
 				
+				for(k=0;command->argv[k]!=NULL;k++){
+				printf("%d%s%d%s\n",k,command->name,command->argc,command->argv[k]);
+				}
 				
 				char* temp =getenv("PATH");
 				char temparr[PATH_MAX];
 				char* temp2 = &temparr[0];
 				char storage[PATH_MAX];	
 				
-				if(temp == NULL){				
-					printf("env vars are nonexistant");
-				
-				}
-				else strcpy(storage, temp);
+				strcpy(storage, temp);
 				
 				temp = strcpy(storage, temp);
 				temp2 = strcpy(temp2, temp);
-				
+				printf("\n****shortpath is %s\n", shortPath);
 				temp = strtok(storage, ":");
-				
+				temp2 = strcpy(temp2, temp);
 				strcat(temp2, shortPath);
 				
 				while(1){
@@ -156,7 +152,7 @@ int main () {
 				}
 					
 			
-				printf("\nFile not found");
+				printf("File not found\n");
 				for(k=0;k<(command->argc);k++){
 					free(command->argv[k]);
 				}
