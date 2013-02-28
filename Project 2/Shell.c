@@ -120,7 +120,8 @@ int main () {
 				
 				
 				char* temp =getenv("PATH");
-				
+				char temparr[PATH_MAX];
+				char* temp2 = &temparr[0];
 				char storage[PATH_MAX];	
 				
 				if(temp == NULL){				
@@ -129,29 +130,39 @@ int main () {
 				}
 				else strcpy(storage, temp);
 				
-				printf("here");
 				temp = strcpy(storage, temp);
+				temp2 = strcpy(temp2, temp);
 				
 				temp = strtok(storage, ":");
 				
+				strcat(temp2, shortPath);
 				
-				printf("temp is %s\n", temp);
-				strcat(temp, shortPath);
-				printf("temp is now %s", temp);
-				//Code between here
-				while () == NULL){
-					printf("inloop");
-					temp = strtok(NULL, ":");				
-					strcat(temp, shortPath);
+				while(1){
+					if(access(temp2,F_OK) == 0){
+						printf("file found");
+						execv(temp2, command->argv);
+					}
+					else if(access(temp2,F_OK) == 0){
+					 	
+					 }
+					temp = strtok(NULL, ":");
+					
+					if(temp == NULL){
+						break;
+					}
+					strcpy(temp2, temp);
+					strcat(temp2,shortPath);
+					printf("searching %s\n", temp2);
 				}
-				execv(temp, command->argv);
-				//and here
-				
+					
+			
+				printf("\nFile not found");
 				for(k=0;k<(command->argc);k++){
 					free(command->argv[k]);
 				}
 				free(command->name);
 				return 0;
+				
 			}
 			else if (childPID == -1){
 				printf("\nCould not fork process");
