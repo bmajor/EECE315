@@ -64,8 +64,7 @@ int main () {
 		
 		
 		
-		//Parsing arguments
-		printf("shortpath first is %s\n", shortPath);		
+		//Parsing arguments	
 		while(Args != NULL){
 			
 			command->argv[k] = malloc(PATH_MAX+1);
@@ -76,7 +75,6 @@ int main () {
 		}
 		
 		command->argv[k] = NULL;
-		printf("shortpath next is %s\n", shortPath);
 		//commands that run on the parent thread
 		if(strcmp(command->name,"")==0){
 			
@@ -116,7 +114,6 @@ int main () {
 			if(childPID == 0){
 				
 				for(k=0;command->argv[k]!=NULL;k++){
-				printf("%d%s%d%s\n",k,command->name,command->argc,command->argv[k]);
 				}
 				
 				char* temp =getenv("PATH");
@@ -128,14 +125,12 @@ int main () {
 				
 				temp = strcpy(storage, temp);
 				temp2 = strcpy(temp2, temp);
-				printf("\n****shortpath is %s\n", shortPath);
 				temp = strtok(storage, ":");
 				temp2 = strcpy(temp2, temp);
 				strcat(temp2, shortPath);
 				
 				while(1){
 					if(access(temp2,F_OK) == 0){
-						printf("file found");
 						execv(temp2, command->argv);
 					}
 					else if(access(temp2,F_OK) == 0){
@@ -148,7 +143,6 @@ int main () {
 					}
 					strcpy(temp2, temp);
 					strcat(temp2,shortPath);
-					printf("searching %s\n", temp2);
 				}
 					
 			
