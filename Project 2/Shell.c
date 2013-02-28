@@ -77,13 +77,13 @@ int main () {
 		command->argv[k] = NULL;
 		command->argc = k;
 		
-		for(k=0;command->argv[k]!=NULL;k++){
-		printf("%d%s%d%s\n",k,command->name,command->argc,command->argv[k]);
-		}
-		//commands that run on the parent thread
-		if(strcmp(command->argv[0],"")==0);
 		
-		else if (strcmp(command->argv[0],"exit") == 0 ){
+		//commands that run on the parent thread
+		if(strcmp(command->name,"")==0){
+			
+		}
+		
+		else if (strcmp(command->name,"exit") == 0 ){
 			
 			free(command->argv[0]);
 			break;
@@ -91,7 +91,7 @@ int main () {
 		
 		
 		
-		else if (strcmp(command->argv[0],"cd") == 0 ){
+		else if (strcmp(command->name,"cd") == 0 ){
 			
 			int ret;
 			if(command->argc < 3) {
@@ -107,36 +107,45 @@ int main () {
 		}
 		
 		
-		// Rename a file. Ex: mv ./folder/oldname.txt ./folder/newname.txt
-		else if (strcmp(command->argv[0],"mv") == 0){
-			rename(command->argv[1], command->argv[2]);
-		}
-		
 		//If it is not an instruction to be run by the parent, fork a child
 		else {
+		
+			for(k=0;command->argv[k]!=NULL;k++){
+				printf("%d%s%d%s\n",k,command->name,command->argc,command->argv[k]);
+			}
 			
 			childPID = fork();
+			
 			if(childPID == 0){
 				
-				printf("forked");
+				
 				char* temp =getenv("PATH");
-				printf("hereoeajifejowfw%s", temp);
-				char storage[PATH_MAX];		
+				
+				char storage[PATH_MAX];	
 				
 				if(temp == NULL){				
 					printf("env vars are nonexistant");
 				
 				}
 				else strcpy(storage, temp);
+				
 				printf("here");
 				temp = strcpy(storage, temp);
+				
 				temp = strtok(storage, ":");
-				while(temp != NULL){
-					strcat(temp,shortPath);;
-					execv(temp, command->argv); 
-					temp = strtok(NULL,":");
-					
-				}	
+				
+				
+				printf("temp is %s\n", temp);
+				strcat(temp, shortPath);
+				printf("temp is now %s", temp);
+				//Code between here
+				while () == NULL){
+					printf("inloop");
+					temp = strtok(NULL, ":");				
+					strcat(temp, shortPath);
+				}
+				execv(temp, command->argv);
+				//and here
 				
 				for(k=0;k<(command->argc);k++){
 					free(command->argv[k]);
@@ -146,7 +155,7 @@ int main () {
 			}
 			else if (childPID == -1){
 				printf("\nCould not fork process");
-			}
+			}	
 		
 			// Parent waits until child finishes executing command if a & is not found at end of command
 		
